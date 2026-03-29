@@ -1,0 +1,27 @@
+- rule: Write below etc
+  desc: Detect any write to /etc directory
+  condition: evt.type in (open, openat) and evt.arg.flags contains O_WRONLY and fd.name startswith /etc
+  output: "ALERT: File in /etc modified (user=%user.name command=%proc.cmdline file=%fd.name)"
+  priority: WARNING
+  tags: [filesystem]
+
+- rule: Read sensitive file shadow
+  desc: Detect reading of /etc/shadow
+  condition: open_read and fd.name=/etc/shadow
+  output: "ALERT: /etc/shadow accessed (user=%user.name command=%proc.cmdline)"
+  priority: CRITICAL
+  tags: [filesystem]
+
+- rule: Interactive shell detected
+  desc: Detect interactive shell inside container
+  condition: spawned_process and proc.name in (bash, sh, zsh)
+  output: "ALERT: Interactive shell detected (user=%user.name command=%proc.cmdline)"
+  priority: WARNING
+  tags: [shell]
+
+- rule: Netcat listener detected
+  desc: Detect netcat reverse shell
+  condition: proc.name=nc or proc.name=ncat
+  output: "ALERT: Netcat detected (user=%user.name command=%proc.cmdline)"
+  priority: CRITICAL
+  tags: [network]

@@ -1,0 +1,19 @@
+customRules:
+  falco_rules.local.yaml: |-
+    - rule: Read sensitive file shadow
+      desc: Detect reading of /etc/shadow
+      condition: open_read and fd.name=/etc/shadow
+      output: "ALERT: /etc/shadow accessed (user=%user.name command=%proc.cmdline)"
+      priority: CRITICAL
+
+    - rule: Netcat detected
+      desc: Detect netcat usage
+      condition: proc.name=nc
+      output: "ALERT: Netcat detected (user=%user.name command=%proc.cmdline)"
+      priority: CRITICAL
+
+    - rule: Interactive shell
+      desc: Detect shell
+      condition: spawned_process and proc.name in (bash, sh)
+      output: "ALERT: Shell detected (user=%user.name command=%proc.cmdline)"
+      priority: WARNING
